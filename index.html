@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Leaflet Quick Start Guide Example</title>
+	<meta charset="utf-8" />
+
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+	<link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.css" />
+</head>
+<body>
+	<div id="map" style="width: 900px; height: 600px"></div>
+
+	<script src="http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.js"></script>
+	<script src="js/jquery-3.0.0.js"></script>
+	<script>
+
+		var map = L.map('map').setView([46.3191,-0.4415], 15);
+
+		L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}', {
+    attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>',
+    maxZoom: 18,
+			id: 'loicc.0fh367h2',
+			accessToken: 'pk.eyJ1IjoibG9pY2MiLCJhIjoiY2lwcmJsMHE1MDA0bGgybnIyZ3puMWN2dSJ9.qH8x1GjEISEQEh_chfIQpw'
+		}).addTo(map);
+
+
+		L.marker([46.3191,-0.4415]).addTo(map)
+			.bindPopup("<b>Hello world!</b><br />I am a popup.").openPopup();
+
+			var street = "'Place de la brèche'",
+					city="'Niort'";
+					nominatimQueryUrl = "http://nominatim.openstreetmap.org/search?format=json&limit=5&countrycodes=fr&street="+street+"&city="+city;
+
+			$.getJSON(nominatimQueryUrl, function(data) {
+        var items = [];
+
+
+				L.marker([data[0].lat,data[0].lon]).addTo(map);
+	    });
+
+
+		var popup = L.popup();
+
+		function onMapClick(e) {
+			popup
+				.setLatLng(e.latlng)
+				.setContent("You clicked the map at " + e.latlng.toString())
+				.openOn(map);
+		}
+
+		map.on('click', onMapClick);
+
+	</script>
+</body>
+</html>

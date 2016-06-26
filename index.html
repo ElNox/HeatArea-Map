@@ -35,90 +35,40 @@
 		 </div>
 	 </nav>
 
-	 <div class="container" style="margin-top:51px;">
+	 <div class="container" style="margin-top:61px;">
 
-		 <div class="row">
-			 <div class="col-md-4">
- 				<input type="file" name="filename" id="filename">
- 				<div id="unknown">
-					Errors :
- 					<ul></ul>
- 				</div>
- 			</div>
-			<div id="map" class="col-md-8" style="width: 100%; height: 80vh"></div>
+		 <div class="locateAddressMap" data-zoom="13" data-lat="46.391" data-lng="-0.4415">
+
+			 <div id="detail" style="width:25%;float:left;">
+				 <form>
+					 <input id="hasCoord" name="hasCoord" type="checkbox" value="true"/> Has coordinates<br>
+					 <input id="hasHeader" name="hasHeader" type="checkbox" value="true"/> Has header<br>
+					 <input id="loadfile" name="filename" type="file"/>
+					 <input id="locate-btn" type="button" value="Locate them !"></input>
+				 </form>
+				 <fieldset id="unknown-location">
+					 <legend>Erreurs</legend>
+					 <ul></ul>
+				 </fieldset>
+				 <fieldset id="detail-location">
+					 <legend>Détails</legend>
+					 <div>Les détails</div>
+				 </fieldset>
+			 </div>
+
+			 <div id="map" style="width: 75%; height: 80vh"></div>
+
 		</div>
 
 	</div>
 
 	<script src="http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.js"></script>
-	<script src="js/jquery-3.0.0.js"></script>
+	<script src="js/jquery-2.2.4.min.js"></script>
 	<script src="js/jquery.csv.min.js"></script>
 	<!-- Include all compiled plugins (below), or include individual files as needed -->
-    <script src="js/bootstrap.min.js"></script>
-	<script>
+  <script src="js/bootstrap.min.js"></script>
 
-		var map = L.map('map').setView([46.3191,-0.4415], 13),
-				$unknownUl = $("#unknown").find("ul");
+	<script src="locate-address.js" type="text/javascript"></script>
 
-		L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}', {
-    attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>',
-    maxZoom: 18,
-			id: 'loicc.0fh367h2',
-			accessToken: 'pk.eyJ1IjoibG9pY2MiLCJhIjoiY2lwcmJsMHE1MDA0bGgybnIyZ3puMWN2dSJ9.qH8x1GjEISEQEh_chfIQpw'
-		}).addTo(map);
-
-		var adherents = [];
-		$("#filename").change(function(e) {
-			var ext = $("input#filename").val().split(".").pop().toLowerCase(),
-					hasHeader = true;
-
-			if($.inArray(ext, ["csv"]) == -1) {
-				alert('Upload CSV');
-				return false;
-			}
-
-			if (e.target.files != undefined) {
-				var reader = new FileReader();
-				reader.onload = function(e) {
-					var data = $.csv.toArrays(e.target.result);
-	        data.forEach(function(row, rowIndex){
-						if((hasHeader && rowIndex!==0) || (!hasHeader)) {
-							var adh = {
-								street:row[2],
-								city:row[4],
-								countrycode:"fr"
-							};
-							addPoint(adh.street, adh.city, adh.countrycode);
-						}
-	        });
-				};
-				reader.readAsText(e.target.files.item(0));
-			}
-
-			return false;
-
-		});
-
-		function addPoint(street, city, countrycode) {
-			var nominatimQueryUrl = "http://nominatim.openstreetmap.org/search?format=json&limit=1&countrycode="+countrycode+"&street="+street+"&city="+city;
-
-			//window.console.log("Processing : ["+street+","+city+"]");
-
-			$.getJSON(nominatimQueryUrl, function(data) {
-        if(data.length>0){
-					//window.console.log("Found : ["+data[0].lat+","+data[0].lon+"]");
-					var marker = L.marker([data[0].lat,data[0].lon]);
-					marker.bindPopup("Nom<br/>"+street+" à "+city, L.popup());
-					marker.addTo(map);
-				}else{
-					//window.console.error("Unknow address : ["+street+","+city+"]");
-					$unknownUl.append("<li>Cannot find : "+street+","+city+"</li>");
-				}
-	    }).fail(function(e){
-				$unknownUl.append("<li>Call failed ("+e.state()+") : "+street+","+city+"</li>");
-			});
-		}
-
-	</script>
 </body>
 </html>

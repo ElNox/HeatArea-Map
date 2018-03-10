@@ -37,8 +37,9 @@
         data.forEach(function(row, rowIndex){
           if((hasHeader && rowIndex!==0) || (!hasHeader)) {
             var adh = {
+              nom:row[0]+" "+row[1],
               street:row[2],
-              city:row[4],
+              city:row[3],
               countrycode:"fr"
             };
             adherents.push(addCoordToAdh(adh));
@@ -54,15 +55,16 @@
   });
 
   function addCoordToAdh(adh) {
-    var nominatimQueryUrl = "http://nominatim.openstreetmap.org/search?format=json&limit=1&countrycode="+adh.countrycode+"&street="+adh.street+"&city="+adh.city;
+    //var nominatimQueryUrl = "http://nominatim.openstreetmap.org/search?format=json&limit=1&countrycode="+adh.countrycode+"&street="+adh.street+"&city="+adh.city;
+    var nominatimQueryUrl = "https://api-adresse.data.gouv.fr/search/?q="+adh.street+" "+adh.city;
 
     //window.console.log("Processing : ["+street+","+city+"]");
     $.getJSON(nominatimQueryUrl, function(data) {
-      if(data.length>0){
+      if(data.features.length>0){
         //window.console.log("Found : ["+data[0].lat+","+data[0].lon+"]");
         adh.position = {
-          lat : data[0].lat,
-          lng : data[0].lon
+          lat : data.features[0].geometry.coordinates[1],
+          lng : data.features[0].geometry.coordinates[0]
         };
         addPoint(adh);
       }else{
@@ -78,7 +80,7 @@
   function addPoint(adh) {
     if(adh.position && adh.position.lat && adh.position.lng){
       var marker = L.marker([adh.position.lat,adh.position.lng]);
-      marker.bindPopup("Nom<br/>"+adh.street+" à "+adh.city, L.popup());
+      marker.bindPopup(adh.nom+"<br/>"+adh.street+" à "+adh.city, L.popup());
       marker.addTo(map);
       return marker;
     }
